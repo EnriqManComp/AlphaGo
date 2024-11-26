@@ -3,10 +3,14 @@ A random bot implementation ( 30 kyu )
 """
 
 import random
-from base import Agent
-from helpers import is_point_an_eye
+from go.agent.base import Agent
+from go.agent.helpers import is_point_an_eye
 from go.goboard_slow import Move
 from go.gotypes import Point
+
+
+__all__ = ['RandomBot']
+
 
 class RandomBot(Agent):
     def select_move(self, game_state):
