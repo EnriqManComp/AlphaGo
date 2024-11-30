@@ -19,6 +19,7 @@ def main():
             move = goboard.Move.play(point)
         else:
             move = bot.select_move(game)
+            
         print_move(game.next_player, move)
         game = game.apply_move(move)
 
