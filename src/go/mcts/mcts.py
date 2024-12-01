@@ -1,5 +1,6 @@
 from go.gotypes import Player
 import random
+from go import agent
 
 # Data structure to represent Monte Carlo Tree Search
 class MCTSNode(object):
@@ -51,3 +52,54 @@ class MCTSNode(object):
         Returns the fraction of rollouts that were won by a given player
         """
         return float(self.win_counts[player]) / float(self.num_rollouts)
+
+# MCTS algorithm
+""" 
+You start by creating a new tree. The root node is the current game
+Then you repeatly generate rollouts.
+
+Each round begins by walking down the tree until you find a node where
+you can add a child ( any legal move that is not played yet in the tree)
+
+"""
+
+class MCTSAgent(agent.Agent):
+
+    def __init__(self, num_rounds, temperature):
+        agent.Agent.__init__(self)
+        self.num_rounds = num_rounds
+        self.temperature = temperature
+
+    def select_move(self, game_state):
+        root = MCTSNode(game_state)
+
+        for i in range(self.num_rounds):
+            node = root
+
+            while (not node.can_add_child()) and (not node.is_terminal()):
+                node = self.select_child(node)
+
+            if node.can_add_child():
+                # Add a new child node 
+                node = node.add_random_child()
+
+            # Simulates a random game from this node
+            winner = self.simulate_random_game(node.game_state)
+
+            # Propagates the score back up the tree
+            while node is not None:
+                node.record_win(winner)
+                node = node.parent
+
+        # Select a move after completing a MCTS rollouts
+        best_move = None
+        best_pct = -1.0
+        for child in root.children:
+            child_pct = child.winning_pct(game_state.next_player)
+            if child_pct > best_pct:
+                best_pct = child_pct
+                best_move = child.move
+        
+        return best_move
+
+            
