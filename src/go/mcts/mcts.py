@@ -1,6 +1,7 @@
 from go.gotypes import Player
 import random
 from go import agent
+import math
 
 # Data structure to represent Monte Carlo Tree Search
 class MCTSNode(object):
@@ -101,5 +102,26 @@ class MCTSAgent(agent.Agent):
                 best_move = child.move
         
         return best_move
+
+    def select_child(self, node):
+        """
+        Select a child according to UCT formula
+        """
+        total_rollouts = sum(child.num_rollouts for child in node.children)
+        log_rollouts = math.log(total_rollouts)
+
+        best_score = -1
+        best_child = None
+
+        for child in node.children:
+            # Calculate UCT score
+            win_pct = child.winning_frac(node.game_state.next_player)
+            exploration_factor = math.sqrt(log_rollouts / child.num_rollouts)
+            uct_score = win_pct + self.temperature * exploration_factor
+            # Check if it is the largest score
+            if uct_score > best_score:
+                best_score = uct_score
+                best_child = child
+        return child
 
             
