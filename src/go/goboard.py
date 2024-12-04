@@ -1,5 +1,5 @@
 import copy
-from go.gotypes import Player
+from go.gotypes import Player, Point
 
 # Move represents the possible options that a player can choose (play a stone, pass or resign)
 # You call Move.play, Move.pass_turn, Move.resign to contruct an instance of a move
